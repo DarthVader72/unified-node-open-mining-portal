@@ -1,0 +1,70 @@
+{
+    "enabled": true,
+    "coin": "energi.json",
+
+    "auxes": [
+    ],
+    "address": "<energiAddress>",
+
+    "rewardRecipients": {
+    },
+
+    "paymentProcessing": {
+        "enabled": true,
+        "paymentInterval": 600,
+        "minimumPayment": 2,
+        "daemon": {
+            "host": "127.0.0.1",
+            "port": 9796,
+            "user": "energirpc",
+            "password": "rpcpassword"
+        }
+    },
+
+    "ports": {
+        "3008": {
+            "diff": 0.008
+        },
+        "3032": {
+            "diff": 0.02,
+            "varDiff": {
+                "minDiff": 0.008,
+                "maxDiff": 256,
+                "targetTime": 15,
+                "retargetTime": 90,
+                "variancePercent": 30
+            }
+        },
+        "3256": {
+            "diff": 1
+        }
+    },
+
+    "daemons": [
+        {
+            "host": "127.0.0.1",
+            "port": 9796,
+            "user": "energirpc",
+            "password": "rpcpassword"
+        }
+    ],
+
+    "p2p": {
+        "enabled": false,
+        "host": "127.0.0.1",
+        "port": 19333,
+        "disableTransactions": false
+    },
+
+    "mposMode": {
+        "enabled": false,
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "me",
+        "password": "mypass",
+        "database": "ltc",
+        "checkPassword": false,
+        "autoCreateWorker": false
+    }
+
+}
