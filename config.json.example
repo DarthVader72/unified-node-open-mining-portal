@@ -34,9 +34,9 @@
     "website": {
         "enabled": true,
         "host": "0.0.0.0",
-        "siteTitle": "UNOMP Beta",
+        "siteTitle": "Energi Mining Pool",
         "port": 80,
-        "stratumHost": "pool.unomp.org",
+        "stratumHost": "mining.energi.network",
         "stats": {
             "updateInterval": 60,
             "historicalRetention": 43200,
