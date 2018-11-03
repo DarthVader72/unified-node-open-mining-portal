@@ -1,5 +1,6 @@
 {
     "enabled": true,
+    "testnet": true,
     "coin": "energi.json",
 
     "auxes": [
@@ -15,14 +16,14 @@
         "minimumPayment": 2,
         "daemon": {
             "host": "127.0.0.1",
-            "port": 9796,
+            "port": 19796,
             "user": "energirpc",
             "password": "<password>"
         }
     },
 
     "ports": {
-        "9795": {
+        "19795": {
             "diff": 0.01,
             "varDiff": {
                 "minDiff": 0.001,
@@ -37,7 +38,7 @@
     "daemons": [
         {
             "host": "127.0.0.1",
-            "port": 9796,
+            "port": 19796,
             "user": "energirpc",
             "password": "<password>"
         }
@@ -46,7 +47,7 @@
     "p2p": {
         "enabled": true,
         "host": "127.0.0.1",
-        "port": 9796,
+        "port": 19796,
         "disableTransactions": true
     }
 }

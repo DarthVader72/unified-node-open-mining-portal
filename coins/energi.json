@@ -1,5 +1,7 @@
 {
     "name": "Energi",
     "symbol": "NRG",
-    "algorithm": "nrghash"
+    "algorithm": "nrghash",
+    "peerMagic": "ec2d9aaf",
+    "peerMagicTestnet": "d92aab6e"
 }
