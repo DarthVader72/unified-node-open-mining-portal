@@ -14,7 +14,7 @@ var PaymentProcessor = require('./libs/paymentProcessor.js');
 var Website = require('./libs/website.js');
 var ProfitSwitch = require('./libs/profitSwitch.js');
 
-var algos = require('merged-pooler/lib/algoProperties.js');
+var algos = require('@energicryptocurrency/merged-pool/lib/algoProperties.js');
 
 JSON.minify = JSON.minify || require("node-json-minify");
 
@@ -26,14 +26,17 @@ if (!fs.existsSync('config.json')){
 var portalConfig = JSON.parse(JSON.minify(fs.readFileSync("config.json", {encoding: 'utf8'})));
 var poolConfigs;
 
-var logger = PoolLogger.getLogger();
+PoolLogger.configure({
+    appenders: {
+        out: { type: 'console' },
+    },
+    categories: {
+        default: { appenders: [ 'out' ], level: 'info' },
+    },
+});
+const logger = PoolLogger.getLogger();
 
-logger.info('New Relic');
-try {
-//    require('newrelic');
-    if (cluster.isMaster)
-        logger.debug('NewRelic', 'Monitor', 'New Relic initiated');
-} catch(e) {}
+logger.info('Started');
 
 
 //Try to give process ability to handle 100k concurrent connections
