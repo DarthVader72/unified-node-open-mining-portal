@@ -1,3 +1,5 @@
+'use strict';
+
 var redis = require('redis');
 var async = require('async');
 var express = require('express');

@@ -1,5 +1,7 @@
+'use strict';
+
 var redis = require('redis');
-var Stratum = require('merged-pooler');
+var Stratum = require('@energicryptocurrency/merged-pool');
 
 
 

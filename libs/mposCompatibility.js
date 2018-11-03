@@ -1,3 +1,5 @@
+'use strict';
+
 var mysql = require('mysql');
 var cluster = require('cluster');
 module.exports = function(logger, poolConfig){

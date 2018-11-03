@@ -1,4 +1,6 @@
-var Stratum = require('merged-pooler');
+'use strict';
+
+var Stratum = require('@energicryptocurrency/merged-pool');
 var redis   = require('redis');
 var net     = require('net');
 
@@ -280,7 +282,7 @@ module.exports = function(logger){
             // In addition, the proxy config also takes diff and varDiff parmeters the override the
             // defaults for the standard config of the coin.
             //
-            Object.keys(portalConfig.switching).forEach(function(switchName) {
+            Object.keys(portalConfig.switching || {}).forEach(function(switchName) {
 
                 var algorithm = portalConfig.switching[switchName].algorithm;
 
@@ -360,7 +362,7 @@ module.exports = function(logger){
 
         logger.debug(logSystem, logComponent, algo, 'Setting proxy difficulties after pool start');
 
-        Object.keys(portalConfig.switching).forEach(function(switchName) {
+        Object.keys(portalConfig.switching || {}).forEach(function(switchName) {
             if (!portalConfig.switching[switchName].enabled) return;
 
             var switchAlgo = portalConfig.switching[switchName].algorithm;

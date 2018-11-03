@@ -1,13 +1,15 @@
+'use strict';
+
 var async  = require('async');
 var net    = require('net');
 var bignum = require('bignum');
 var fs     = require('fs');
 
-var algos  = require('merged-pooler/lib/algoProperties.js');
-var util   = require('merged-pooler/lib/util.js');
+var algos  = require('@energicryptocurrency/merged-pool/lib/algoProperties.js');
+var util   = require('@energicryptocurrency/merged-pool/lib/util.js');
 var Poloniex = require('./apiPoloniex.js');
 var Bittrex  = require('./apiBittrex.js');
-var Stratum  = require('merged-pooler');
+var Stratum  = require('@energicryptocurrency/merged-pool');
 
 module.exports = function(logger){
 

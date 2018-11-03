@@ -1,10 +1,12 @@
+'use strict';
+
 var fs = require('fs');
 
 var redis = require('redis');
 var async = require('async');
 
-var Stratum = require('merged-pooler');
-var util = require('merged-pooler/lib/util.js');
+var Stratum = require('@energicryptocurrency/merged-pool');
+var util = require('@energicryptocurrency/merged-pool/lib/util.js');
 
 
 module.exports = function(logger){
@@ -44,8 +46,12 @@ module.exports = function(logger){
             SetupForPool(logger, poolConfigs[coin], function(setupResults){
                 callback(setupResults);
             });
-        }, function(coins){
-            coins.forEach(function(coin){
+        }, function(res){
+            if (!res) {
+                logger.error("Failed to setup pools");
+                return;
+            }
+            enPools.forEach(function(coin){
 
                 var poolOptions = poolConfigs[coin];
                 var processingConfig = poolOptions.paymentProcessing;
@@ -124,7 +130,7 @@ function SetupForPool(logger, poolOptions, setupFinished){
                     callback();
                 }
                 catch(e){
-                    logger.error(logSystem, logComponent, 'Error detecting number of satoshis in a coin, cannot do payment processing. Tried parsing: ' + result.data);
+                    logger.error(logSystem, logComponent, 'Error detecting number of satoshis in a coin, cannot do payment processing. Tried parsing: ' + result.data + ' error ' + e);
                     callback(true);
                 }
 
