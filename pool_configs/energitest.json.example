@@ -47,7 +47,7 @@
     "p2p": {
         "enabled": true,
         "host": "127.0.0.1",
-        "port": 19796,
+        "port": 19797,
         "disableTransactions": true
     }
 }

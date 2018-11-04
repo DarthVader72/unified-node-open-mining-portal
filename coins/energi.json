@@ -2,6 +2,6 @@
     "name": "Energi",
     "symbol": "NRG",
     "algorithm": "nrghash",
-    "peerMagic": "af9a2dec",
-    "peerMagicTestnet": "6eab2ad9"
+    "peerMagic": "ec2d9aaf",
+    "peerMagicTestnet": "d92aab6e"
 }
