@@ -13,7 +13,7 @@ var algos = require('@energicryptocurrency/merged-pool/lib/algoProperties.js');
 // redis callback Ready check failed bypass trick
 function rediscreateClient(port, host, pass, db) {
     var client = redis.createClient(port, host);
-    client.auth(pass);
+    //client.auth(pass);
     client.select(db);
     return client;
 }
@@ -66,7 +66,7 @@ module.exports = function(logger, portalConfig, poolConfigs){
     function setupStatsRedis(){
         redisStats = redis.createClient(portalConfig.redis.port, portalConfig.redis.host);
 	// logger.debug(logSystem, 'Global', 'redis.Auth1 "' + portalConfig.redis.password + '"');
-	redisStats.auth(portalConfig.redis.password);
+	//redisStats.auth(portalConfig.redis.password);
 	redisStats.select(portalConfig.redis.db);
 
         redisStats.on('error', function(err){
