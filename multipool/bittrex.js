@@ -1,5 +1,9 @@
+'use strict';
+
+const utils = require('../libs/utils');
 var redis = require('redis');
-client = redis.createClient()
+client = redis.createClient();
+utils.redisKeepalive(client);
 schedule = require('node-schedule');
 async = require('async')
 var bittrex = require('node.bittrex.api');

@@ -7,6 +7,7 @@ var async = require('async');
 
 var Stratum = require('@energicryptocurrency/merged-pool');
 var util = require('@energicryptocurrency/merged-pool/lib/util.js');
+const utils = require('./utils');
 
 
 module.exports = function(logger){
@@ -91,6 +92,7 @@ function SetupForPool(logger, poolOptions, setupFinished){
     var redisClient = redis.createClient(poolOptions.redis.port, poolOptions.redis.host);
 	//redisClient.auth(poolOptions.redis.password);
 	redisClient.select(poolOptions.redis.db);
+    utils.redisKeepalive(redisClient);
 
     var magnitude;
     var minPaymentSatoshis;

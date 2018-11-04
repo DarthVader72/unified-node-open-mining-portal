@@ -13,6 +13,7 @@ var compress = require('compression');
 
 var Stratum = require('@energicryptocurrency/merged-pool');
 var util = require('@energicryptocurrency/merged-pool/lib/util.js');
+const utils = require('./utils');
 
 var api = require('./api.js');
 
@@ -146,6 +147,7 @@ module.exports = function(logger){
                  var client = redis.createClient(portalConfig.redis.port, portalConfig.redis.host);
                  //client.auth(portalConfig.redis.password);
                  client.select(portalConfig.redis.db);
+                utils.redisKeepalive(client);
 
                 client.hgetall('coinVersionBytes', function(err, coinBytes){
                     if (err){

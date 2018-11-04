@@ -9,12 +9,14 @@ var async = require('async');
 var os = require('os');
 
 var algos = require('@energicryptocurrency/merged-pool/lib/algoProperties.js');
+const utils = require('./utils');
 
 // redis callback Ready check failed bypass trick
 function rediscreateClient(port, host, pass, db) {
     var client = redis.createClient(port, host);
     //client.auth(pass);
     client.select(db);
+    utils.redisKeepalive(client);
     return client;
 }
 
@@ -65,9 +67,10 @@ module.exports = function(logger, portalConfig, poolConfigs){
 
     function setupStatsRedis(){
         redisStats = redis.createClient(portalConfig.redis.port, portalConfig.redis.host);
-	// logger.debug(logSystem, 'Global', 'redis.Auth1 "' + portalConfig.redis.password + '"');
-	//redisStats.auth(portalConfig.redis.password);
-	redisStats.select(portalConfig.redis.db);
+        // logger.debug(logSystem, 'Global', 'redis.Auth1 "' + portalConfig.redis.password + '"');
+        //redisStats.auth(portalConfig.redis.password);
+        redisStats.select(portalConfig.redis.db);
+        utils.redisKeepalive(redisStats);
 
         redisStats.on('error', function(err){
             logger.error(logSystem, 'Historics', 'Redis for stats had an error ' + JSON.stringify(err));

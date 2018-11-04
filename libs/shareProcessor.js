@@ -2,7 +2,7 @@
 
 var redis = require('redis');
 var Stratum = require('@energicryptocurrency/merged-pool');
-
+const utils = require('./utils');
 
 
 /*
@@ -30,8 +30,9 @@ module.exports = function(logger, poolConfig){
 
     var connection = redis.createClient(redisConfig.port, redisConfig.host);
     // redis auth if needed
-     //connection.auth(redisConfig.password);
-     connection.select(redisConfig.db);
+    //connection.auth(redisConfig.password);
+    connection.select(redisConfig.db);
+    utils.redisKeepalive(connection);
 
     connection.on('ready', function(){
         logger.debug(logSystem, logComponent, logSubCat, 'Share processing setup with redis (' + redisConfig.host +
