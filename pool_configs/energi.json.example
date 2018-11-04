@@ -23,12 +23,12 @@
 
     "ports": {
         "9795": {
-            "diff": 0.01,
+            "diff": 8,
             "varDiff": {
-                "minDiff": 0.001,
-                "maxDiff": 256,
-                "targetTime": 15,
-                "retargetTime": 90,
+                "minDiff": 2,
+                "maxDiff": 512,
+                "targetTime": 5,
+                "retargetTime": 15,
                 "variancePercent": 30
             }
         }
