@@ -39,7 +39,7 @@
         "url": "https://github.com/energicryptocurrency/unified-node-open-mining-portal.git"
     },
     "dependencies": {
-        "@energicryptocurrency/merged-pool": "*",
+        "@energicryptocurrency/merged-pool": "^1.2.0",
         "async": "^2.6.1",
         "bignum": "*",
         "bitcoin": "*",
