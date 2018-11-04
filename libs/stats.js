@@ -353,7 +353,7 @@ this.getCoins = function(cback){
                     }
                 });
 
-                var shareMultiplier = 0xFFFF / algos[coinStats.algorithm].multiplier;
+                var shareMultiplier = 0xFFFFFFFF / algos[coinStats.algorithm].multiplier;
                 coinStats.hashrate = shareMultiplier * coinStats.shares / portalConfig.website.stats.hashrateWindow;
                 coinStats.workerCount = Object.keys(coinStats.workers).length;
                 portalStats.global.workers += coinStats.workerCount;
