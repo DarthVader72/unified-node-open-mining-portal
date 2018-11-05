@@ -150,32 +150,21 @@ module.exports = function(logger){
 
             var shareProcessor = new ShareProcessor(logger, poolOptions);
 
-	handlers.auth = function(port, workerName, password, authCallback){
-               if (poolOptions.validateWorkerUsername !== true)
-                   authCallback(true);
-               else {
-                   if (workerName.length === 40) {
-                       try {
-                           new Buffer(workerName, 'hex');
-                           authCallback(true);
-                       }
-                       catch (e) {
-                           authCallback(false);
-                       }
-                   }
-                   else {
+            handlers.auth = function(port, workerName, password, authCallback){
+                if (!utils.isValidWorker(workerName)) {
+                    authCallback(false);
+                    return;
+                }
 
-                          workerName = workerName.replace(/([_.!~*'()].*)/g, ''); // strip any extra strings from worker name.
+                const worker_address = utils.worker2address(workerName);
 
-                   pool.daemon.cmd('validateaddress', [workerName], function (results) {
-                           var isValid = results.filter(function (r) {
-                               return r.response.isvalid
-                           }).length > 0;
-                           authCallback(isValid);
-                       });
-                   }
-		}
-   	 };
+                pool.daemon.cmd('validateaddress', [worker_address], function (results) {
+                    var isValid = results.filter(function (r) {
+                        return r.response.isvalid
+                    }).length > 0;
+                    authCallback(isValid);
+                });
+            };
 
             handlers.share = function(isValidShare, isValidBlock, data, coin, aux){
                 shareProcessor.handleShare(isValidShare, isValidBlock, data, coin, aux);
