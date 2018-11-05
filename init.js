@@ -88,6 +88,9 @@ if (cluster.isWorker){
             new ProfitSwitch(logger);
             break;
     }
+    
+    // Safety feature for possible attacks
+    Object.freeze(Object.prototype);
 
     return;
 } 
@@ -542,4 +545,7 @@ var startProfitSwitch = function(){
 
     startCliListener();
         }, 10000);
+
+    // Safety feature for possible attacks
+    Object.freeze(Object.prototype);
 })();
