@@ -144,10 +144,8 @@ module.exports = function(logger){
     var buildKeyScriptPage = function(){
         async.waterfall([
             function(callback){
-                 var client = redis.createClient(portalConfig.redis.port, portalConfig.redis.host);
-                 //client.auth(portalConfig.redis.password);
-                 client.select(portalConfig.redis.db);
-                utils.redisKeepalive(client);
+                var client = redis.createClient(portalConfig.redis.port, portalConfig.redis.host);
+                utils.redisPostConnect(client, portalConfig.redis);
 
                 client.hgetall('coinVersionBytes', function(err, coinBytes){
                     if (err){

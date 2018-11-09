@@ -7,6 +7,15 @@ module.exports = exports = {
         const timer = setInterval(() => client.ping(), 1000 * 10);
         client.on('end', () => clearInterval(timer));
     },
+    redisPostConnect : function(client, {db, password = null }) {
+        if (password && password !== '') {
+            client.auth(password);
+        }
+
+        client.select(db);
+
+        this.redisKeepalive(client);
+    },
     isValidWorker : function(name) {
         return name.match(WORKER_REGEX) != null;
     },

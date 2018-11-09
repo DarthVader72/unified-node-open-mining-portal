@@ -91,9 +91,8 @@ function SetupForPool(logger, poolOptions, setupFinished){
         logger[severity](logSystem, logComponent, message);
     });
     const redisClient = redis.createClient(poolOptions.redis.port, poolOptions.redis.host);
-	//redisClient.auth(poolOptions.redis.password);
-	redisClient.select(poolOptions.redis.db);
-    utils.redisKeepalive(redisClient);
+    utils.redisPostConnect(redisClient, poolOptions.redis);
+	
     const redlock = new Redlock([redisClient]);
     const lock_name = 'payment:lock';
 
