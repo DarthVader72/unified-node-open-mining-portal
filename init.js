@@ -31,7 +31,7 @@ PoolLogger.configure({
         out: { type: 'console' },
     },
     categories: {
-        default: { appenders: [ 'out' ], level: 'info' },
+        default: { appenders: [ 'out' ], level: 'debug' },
     },
 });
 const logger = PoolLogger.getLogger();
