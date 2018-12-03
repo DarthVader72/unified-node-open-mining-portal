@@ -12,7 +12,8 @@ module.exports = function(logger, poolConfig){
         port: mposConfig.port,
         user: mposConfig.user,
         password: mposConfig.password,
-        database: mposConfig.database
+        database: mposConfig.database,
+        connectionLimit:  mposConfig.connectionLimit,
     });
 
 
@@ -114,8 +115,9 @@ module.exports = function(logger, poolConfig){
                 else if (result.affectedRows === 0){
                     connection.query('INSERT INTO `pool_worker` SET ?', {username: workerName, difficulty: diff});
                 }
-                else
-                    console.log('Updated difficulty successfully', result);
+                else {
+                    logger.debug(logIdentify, logComponent, 'Updated difficulty successfully');
+                }
             }
         );
     };

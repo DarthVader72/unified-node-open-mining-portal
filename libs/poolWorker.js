@@ -111,33 +111,55 @@ module.exports = function(logger){
 
 
 
-    var createAndStartPool = function(coin){
-        var poolOptions = poolConfigs[coin];
-        var myAuxes = poolConfigs[coin].auxes;
+    const createAndStartPool = function(coin){
+        const poolOptions = poolConfigs[coin];
+        const myAuxes = poolConfigs[coin].auxes;
 
-        var logSystem = 'Pool';
-        var logComponent = coin;
-        var logSubCat = 'Thread ' + (parseInt(forkId) + 1);
+        const logSystem = 'Pool';
+        const logComponent = coin;
+        const logSubCat = 'Thread ' + (parseInt(forkId) + 1);
 
-        var handlers = {
+        const handlers = {
             auth: function(){},
             share: function(){},
             diff: function(){}
         };
 
+        const { mposMode } = poolOptions;
+
+        const anonymous_auth = (port, workerName, password, authCallback) => {
+            if (!utils.isValidWorker(workerName)) {
+                authCallback(false);
+                return;
+            }
+
+            const worker_address = utils.worker2address(workerName);
+
+            pool.daemon.cmd('validateaddress', [worker_address], function (results) {
+                var isValid = results.filter(function (r) {
+                    return r.response.isvalid
+                }).length > 0;
+                authCallback(isValid);
+            });
+        };
+
         //Functions required for MPOS compatibility
-        if (poolOptions.mposMode && poolOptions.mposMode.enabled){
+        if (mposMode && mposMode.enabled){
             var mposCompat = new MposCompatibility(logger, poolOptions);
 
-            handlers.auth = function(port, workerName, password, authCallback){
-                mposCompat.handleAuth(workerName, password, authCallback);
-            };
+            if (mposMode.anonymousMode) {
+                handlers.auth = anonymous_auth;
+            } else {
+                handlers.auth = (port, workerName, password, authCallback) => {
+                    mposCompat.handleAuth(workerName, password, authCallback);
+                };
+            }
 
-            handlers.share = function(isValidShare, isValidBlock, data){
+            handlers.share = (isValidShare, isValidBlock, data) => {
                 mposCompat.handleShare(isValidShare, isValidBlock, data);
             };
 
-            handlers.diff = function(workerName, diff){
+            handlers.diff = (workerName, diff) => {
                 mposCompat.handleDifficultyUpdate(workerName, diff);
             }
         }
@@ -147,21 +169,7 @@ module.exports = function(logger){
 
             var shareProcessor = new ShareProcessor(logger, poolOptions);
 
-            handlers.auth = function(port, workerName, password, authCallback){
-                if (!utils.isValidWorker(workerName)) {
-                    authCallback(false);
-                    return;
-                }
-
-                const worker_address = utils.worker2address(workerName);
-
-                pool.daemon.cmd('validateaddress', [worker_address], function (results) {
-                    var isValid = results.filter(function (r) {
-                        return r.response.isvalid
-                    }).length > 0;
-                    authCallback(isValid);
-                });
-            };
+            handlers.auth = anonymous_auth;
 
             handlers.share = function(isValidShare, isValidBlock, data, coin, aux){
                 shareProcessor.handleShare(isValidShare, isValidBlock, data, coin, aux);
