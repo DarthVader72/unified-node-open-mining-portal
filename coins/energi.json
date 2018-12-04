@@ -3,5 +3,6 @@
     "symbol": "NRG",
     "algorithm": "nrghash",
     "peerMagic": "ec2d9aaf",
-    "peerMagicTestnet": "d92aab6e"
+    "peerMagicTestnet": "d92aab6e",
+    "mposDiffMultiplier": 256
 }
