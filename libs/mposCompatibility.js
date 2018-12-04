@@ -20,7 +20,13 @@ module.exports = function(logger, poolConfig){
     var logIdentify = 'MySQL';
     var logComponent = coin;
 
-
+    const ensureWorkerFormat = (workerName) => {
+        if (workerName.split('.').length == 1) {
+            return `${workerName}.default`;
+        }
+        
+        return workerName;
+    };
 
     this.handleAuth = function(workerName, password, authCallback){
 
@@ -85,15 +91,16 @@ module.exports = function(logger, poolConfig){
 
         var dbData = [
             shareData.ip,
-            shareData.worker,
+            ensureWorkerFormat(shareData.worker),
             isValidShare ? 'Y' : 'N',
             isValidBlock ? 'Y' : 'N',
             shareData.difficulty * (poolConfig.coin.mposDiffMultiplier || 1),
             typeof(shareData.error) === 'undefined' ? null : shareData.error,
-            shareData.blockHash ? shareData.blockHash : (shareData.blockHashInvalid ? shareData.blockHashInvalid : '')
+            shareData.blockHash ? shareData.blockHash : (shareData.blockHashInvalid ? shareData.blockHashInvalid : ''),
+            shareData.height,
         ];
         connection.query(
-            'INSERT INTO `shares` SET time = NOW(), rem_host = ?, username = ?, our_result = ?, upstream_result = ?, difficulty = ?, reason = ?, solution = ?',
+            'INSERT INTO `shares` SET time = NOW(), rem_host = ?, username = ?, our_result = ?, upstream_result = ?, difficulty = ?, reason = ?, solution = ?, height = ?',
             dbData,
             function(err, result) {
                 if (err)
@@ -105,9 +112,15 @@ module.exports = function(logger, poolConfig){
     };
 
     this.handleDifficultyUpdate = function(workerName, diff){
+        if (!workerName) {
+            return;
+        }
+
+        workerName = ensureWorkerFormat(workerName);
 
         connection.query(
-            'UPDATE `pool_worker` SET `difficulty` = ' + diff + ' WHERE `username` = ' + connection.escape(workerName),
+            'UPDATE `pool_worker` SET `difficulty` = ' + diff + ' WHERE `username` = ?',
+            [workerName],
             function(err, result){
                 if (err)
                     logger.error(logIdentify, logComponent, 'Error when updating worker diff: ' +
