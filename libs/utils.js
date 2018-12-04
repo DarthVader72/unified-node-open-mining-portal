@@ -1,6 +1,6 @@
 'use strict';
 
-const WORKER_REGEX = /^([a-km-zA-HJ-NP-Z1-9]{34})(.[a-zA-Z0-9]+)?$/;
+const WORKER_REGEX = /^([a-km-zA-HJ-NP-Z1-9]{34})(.[a-zA-Z0-9]{1,16})?$/;
 
 module.exports = exports = {
     redisKeepalive : function(client) {
