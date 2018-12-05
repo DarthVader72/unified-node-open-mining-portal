@@ -97,7 +97,7 @@ module.exports = function(logger, poolConfig){
             shareData.difficulty * (poolConfig.coin.mposDiffMultiplier || 1),
             typeof(shareData.error) === 'undefined' ? null : shareData.error,
             shareData.blockHash ? shareData.blockHash : (shareData.blockHashInvalid ? shareData.blockHashInvalid : ''),
-            shareData.height,
+            shareData.height || 0,
         ];
         connection.query(
             'INSERT INTO `shares` SET time = NOW(), rem_host = ?, username = ?, our_result = ?, upstream_result = ?, difficulty = ?, reason = ?, solution = ?, height = ?',
