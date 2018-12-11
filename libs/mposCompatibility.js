@@ -4,10 +4,10 @@ var mysql = require('mysql');
 var cluster = require('cluster');
 module.exports = function(logger, poolConfig){
 
-    var mposConfig = poolConfig.mposMode;
-    var coin = poolConfig.coin.name;
+    const mposConfig = poolConfig.mposMode;
+    const coin = poolConfig.coin.name;
 
-    var connection = mysql.createPool({
+    const connection = mysql.createPool({
         host: mposConfig.host,
         port: mposConfig.port,
         user: mposConfig.user,
@@ -15,10 +15,19 @@ module.exports = function(logger, poolConfig){
         database: mposConfig.database,
         connectionLimit:  mposConfig.connectionLimit,
     });
+    
+    const {
+        anonymousMode,
+        queueShares,
+    } = mposConfig;
+    
+    const CHUNK_MAX = 100;
+    const CHUNK_INTERVAL = 1e3;
+    const all_queues = [];
+    let curr_queue = [];
 
-
-    var logIdentify = 'MySQL';
-    var logComponent = coin;
+    const logIdentify = 'MySQL';
+    const logComponent = coin;
 
     const ensureWorkerFormat = (workerName) => {
         if (workerName.split('.').length == 1) {
@@ -88,7 +97,6 @@ module.exports = function(logger, poolConfig){
     };
 
     this.handleShare = function(isValidShare, isValidBlock, shareData){
-
         var dbData = [
             shareData.ip,
             ensureWorkerFormat(shareData.worker),
@@ -99,20 +107,38 @@ module.exports = function(logger, poolConfig){
             shareData.blockHash ? shareData.blockHash : (shareData.blockHashInvalid ? shareData.blockHashInvalid : ''),
             shareData.height || 0,
         ];
-        connection.query(
-            'INSERT INTO `shares` SET time = NOW(), rem_host = ?, username = ?, our_result = ?, upstream_result = ?, difficulty = ?, reason = ?, solution = ?, height = ?',
-            dbData,
-            function(err, result) {
-                if (err)
-                    logger.error(logIdentify, logComponent, 'Insert error when adding share: ' + JSON.stringify(err));
-                else
-                    logger.debug(logIdentify, logComponent, 'Share inserted');
+        
+        if (queueShares) {
+            const d = new Date();
+            dbData.unshift(d.toISOString().split('.')[0]);
+
+            curr_queue.push(dbData);
+
+            if (curr_queue.length >= CHUNK_MAX) {
+                all_queues.push(curr_queue);
+                curr_queue = [];
             }
-        );
+        } else {
+            connection.query(
+                'INSERT INTO `shares` SET time = NOW(), rem_host = ?, username = ?, our_result = ?, upstream_result = ?, difficulty = ?, reason = ?, solution = ?, height = ?',
+                dbData,
+                function(err, result) {
+                    if (err)
+                        logger.error(logIdentify, logComponent, 'Insert error when adding share: ' + JSON.stringify(err));
+                    else
+                        logger.debug(logIdentify, logComponent, 'Share inserted');
+                }
+            );
+        }
     };
 
     this.handleDifficultyUpdate = function(workerName, diff){
         if (!workerName) {
+            return;
+        }
+
+        if (queueShares || anonymousMode) {
+            // MPOS does not really use it, but disable only for the new modes
             return;
         }
 
@@ -135,5 +161,71 @@ module.exports = function(logger, poolConfig){
         );
     };
 
+    if (queueShares) {
+        let in_progress = false;
+        let force_next_time = false;
+        
+        const process_queue = () => {
+            //logger.debug(logIdentify, logComponent,
+            //             `all_queues = ${JSON.stringify(all_queues)} curr_queue = ${JSON.stringify(curr_queue)}`);
+            //logger.debug(logIdentify, logComponent,
+            //             `ShareQueue pending ${all_queues.length} current length ${curr_queue.length}`);
 
+            if (in_progress) {
+                return;
+            }
+
+            if (all_queues.length == 0) {
+                if (!force_next_time) {
+                    force_next_time = true;
+                    return;
+                } else if (curr_queue.length == 0) {
+                    force_next_time = false;
+                    return;
+                }
+
+                all_queues.push(curr_queue);
+                curr_queue = [];
+            }
+
+            force_next_time = false;
+            in_progress = true;
+            
+            const process_item = () => {
+                if (all_queues.length == 0) {
+                    in_progress = false;
+                    return;
+                }
+
+                const item = all_queues[0];
+                const q = 'INSERT INTO `shares`(time, rem_host, username, our_result, upstream_result, difficulty, reason, solution, height) VALUES ' +
+                    item.map(r => {
+                        r = r.map(v => mysql.escape(v)).join(',');
+                        return`(${r})`;
+                    }).join(',');
+                    
+                //logger.debug(logIdentify, logComponent, `ShareQuery: ${q}`);
+
+                connection.query(
+                    q,
+                    (err, result) => {
+                        if (err) {
+                            logger.error(logIdentify, logComponent,
+                                         `Insert error when adding shares, retrying: ${JSON.stringify(err)}`);
+                        } else {
+                            logger.debug(logIdentify, logComponent,
+                                         `Shares inserted: ${item.length}`);
+                            all_queues.shift();
+                        }
+
+                        process_item();
+                    }
+                );
+            };
+
+            process_item();
+        };
+        
+        setInterval(process_queue, CHUNK_INTERVAL);
+    }
 };

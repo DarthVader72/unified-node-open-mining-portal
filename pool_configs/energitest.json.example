@@ -61,6 +61,7 @@
         "database": "mpos",
         "checkPassword": false,
         "autoCreateWorker": false,
-        "anonymousMode": true
+        "anonymousMode": true,
+        "queueShares": false
     }
 }
